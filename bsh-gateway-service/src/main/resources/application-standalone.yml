@@ -1,0 +1,93 @@
+# 无 Nacos / 注册中心不可用时的本地直连模式（Feign + Gateway 固定 URL）
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+    gateway:
+      routes:
+        - id: supply-files
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/api/files/**,/uploads/**
+        - id: auth
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/auth/**
+        - id: areas
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/areas/**
+        - id: categories
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/categories,/api/categories/**
+        - id: menus
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/menus/**
+        - id: order-merchant-warehouse
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/api/merchant/warehouse,/api/merchant/warehouse/stats
+        - id: supply-warehouse
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/api/merchant/warehouse,/api/merchant/warehouse/**
+        - id: order-merchant-trade
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/api/merchant/supplies/confirm,/api/merchant/supplies/complete,/api/merchant/trades,/api/merchant/trades/**
+        - id: supply-merchant
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/api/merchant/supplies/**
+        - id: order-consumer-trade
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/api/consumer/deposits/**,/api/consumer/trades/**,/api/consumer/sold-trades,/api/consumer/sold-trades/**
+        - id: user-consumer-wallet
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/consumer/wallet,/api/consumer/wallet/**
+        - id: supply-consumer
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/api/consumer/**
+        - id: home
+          uri: http://127.0.0.1:8085
+          predicates:
+            - Path=/api/home/**
+        - id: admin-banners
+          uri: http://127.0.0.1:8085
+          predicates:
+            - Path=/api/admin/banners,/api/admin/banners/**
+        - id: admin
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/admin/**
+        - id: price-api
+          uri: http://127.0.0.1:8084
+          predicates:
+            - Path=/api/price/**
+        - id: price-ws
+          uri: ws://127.0.0.1:8084
+          predicates:
+            - Path=/ws/price/**
+  data:
+    redis:
+      host: ${REDIS_HOST:${MIDDLEWARE_HOST}}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:${BSH_DB_PASS}}
+      timeout: 3s
+
+bsh:
+  services:
+    supply: http://127.0.0.1:8082
+    order: http://127.0.0.1:8083
+    price: http://127.0.0.1:8084
+  gateway:
+    ip-access:
+      user-service-base-url: http://127.0.0.1:8081

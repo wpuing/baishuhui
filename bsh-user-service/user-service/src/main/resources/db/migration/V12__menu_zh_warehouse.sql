@@ -1,0 +1,48 @@
+-- V12: Chinese menu labels + merchant warehouse menu/permission. ASCII comments for H2.
+
+UPDATE bsh_menu SET name = '发布供应' WHERE id = 'm0000000000000000000000000000001';
+UPDATE bsh_menu SET name = '已拍商品' WHERE id = 'm0000000000000000000000000000002';
+UPDATE bsh_menu SET name = '确认交易' WHERE id = 'm0000000000000000000000000000003';
+UPDATE bsh_menu SET name = '逛供应' WHERE id = 'm0000000000000000000000000000004';
+UPDATE bsh_menu SET name = '我的交易' WHERE id = 'm0000000000000000000000000000005';
+UPDATE bsh_menu SET name = '结案完成' WHERE id = 'm0000000000000000000000000000006';
+
+INSERT INTO bsh_permission (id, code, name, create_time, create_user, create_user_name, update_time, update_user, deleted, data_year)
+SELECT 'p0000000000000000000000000000012', 'merchant:warehouse', 'merchant warehouse', CURRENT_TIMESTAMP, 'SYSTEM', 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', 0, 2026
+WHERE NOT EXISTS (SELECT 1 FROM bsh_permission WHERE id = 'p0000000000000000000000000000012');
+
+INSERT INTO bsh_role_permission (role_id, permission_id)
+SELECT 'r0000000000000000000000000000002', 'p0000000000000000000000000000012'
+WHERE NOT EXISTS (
+  SELECT 1 FROM bsh_role_permission
+  WHERE role_id = 'r0000000000000000000000000000002' AND permission_id = 'p0000000000000000000000000000012'
+);
+
+INSERT INTO bsh_role_permission (role_id, permission_id)
+SELECT 'r0000000000000000000000000000001', 'p0000000000000000000000000000012'
+WHERE NOT EXISTS (
+  SELECT 1 FROM bsh_role_permission
+  WHERE role_id = 'r0000000000000000000000000000001' AND permission_id = 'p0000000000000000000000000000012'
+);
+
+INSERT INTO bsh_menu (
+    id, parent_id, client_type, name, path, icon, sort_no, menu_type, permission_code, visible,
+    create_time, create_user, create_user_name, update_time, update_user, deleted, data_year
+)
+SELECT 'm0000000000000000000000000000007', NULL, 'MERCHANT', '我的仓库', '/warehouse', NULL, 30, 'MENU', 'merchant:warehouse', 1,
+       CURRENT_TIMESTAMP, 'SYSTEM', 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', 0, 2026
+WHERE NOT EXISTS (SELECT 1 FROM bsh_menu WHERE id = 'm0000000000000000000000000000007');
+
+INSERT INTO bsh_role_menu (role_id, menu_id)
+SELECT 'r0000000000000000000000000000002', 'm0000000000000000000000000000007'
+WHERE NOT EXISTS (
+  SELECT 1 FROM bsh_role_menu
+  WHERE role_id = 'r0000000000000000000000000000002' AND menu_id = 'm0000000000000000000000000000007'
+);
+
+INSERT INTO bsh_role_menu (role_id, menu_id)
+SELECT 'r0000000000000000000000000000001', 'm0000000000000000000000000000007'
+WHERE NOT EXISTS (
+  SELECT 1 FROM bsh_role_menu
+  WHERE role_id = 'r0000000000000000000000000000001' AND menu_id = 'm0000000000000000000000000000007'
+);

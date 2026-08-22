@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/baishuhui
+
+bsh:
+  services:
+    user: http://127.0.0.1:8081
+    supply: http://127.0.0.1:8082
+    order: http://127.0.0.1:8083
+    price: http://127.0.0.1:8084
+  internal:
+    token: ${BSH_INTERNAL_TOKEN:bsh-local-internal-token}

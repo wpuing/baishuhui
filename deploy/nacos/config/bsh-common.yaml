@@ -1,0 +1,10 @@
+# Nacos 共享配置模板（Data ID: bsh-common.yaml，Group: DEFAULT_GROUP）
+# 公开仓仅保留注释示例，请按环境自行填写后发布到 Nacos，勿写入真实主机地址 / 口令。
+#
+# logging:
+#   level:
+#     root: INFO
+#     com.baishuhui: INFO
+#
+# sentinel:
+#   dashboard: <SENTINEL_HOST:PORT>   # 例：127.0.0.1:8858
