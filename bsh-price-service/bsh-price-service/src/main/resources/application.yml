@@ -1,0 +1,66 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: bsh-price-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR}
+        fail-fast: false
+      config:
+        server-addr: ${NACOS_ADDR}
+        file-extension: yaml
+        import-check:
+          enabled: false
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1:8858}
+        eager: false
+  config:
+    import: optional:nacos:bsh-common.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+knife4j:
+  enable: true
+
+bsh:
+  price:
+    realtime-ttl-seconds: 30
+    history-default-limit: 50
+    history-max-limit: 200
+  internal:
+    token: ${BSH_INTERNAL_TOKEN:bsh-local-internal-token}
+
+logging:
+  level:
+    com.baishuhui: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/baishuhui
+    redis:
+      host: ${REDIS_HOST:${MIDDLEWARE_HOST}}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:${BSH_DB_PASS}}
+      timeout: 3s
+

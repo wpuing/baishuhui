@@ -1,0 +1,161 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: bsh-gateway-service
+  main:
+    web-application-type: reactive
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  codec:
+    max-in-memory-size: 8MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR}
+        fail-fast: false
+      config:
+        server-addr: ${NACOS_ADDR}
+        file-extension: yaml
+        import-check:
+          enabled: false
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1:8858}
+        eager: false
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: supply-files
+          uri: lb://bsh-supply-service
+          predicates:
+            - Path=/api/files/**,/uploads/**
+        - id: auth
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/auth/**
+        - id: areas
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/areas/**
+        - id: categories
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/categories,/api/categories/**
+        - id: menus
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/menus/**
+        - id: order-merchant-warehouse
+          uri: lb://bsh-order-service
+          predicates:
+            - Path=/api/merchant/warehouse,/api/merchant/warehouse/stats
+        - id: supply-warehouse
+          uri: lb://bsh-supply-service
+          predicates:
+            - Path=/api/merchant/warehouse,/api/merchant/warehouse/**
+        - id: order-merchant-trade
+          uri: lb://bsh-order-service
+          predicates:
+            - Path=/api/merchant/supplies/confirm,/api/merchant/supplies/complete,/api/merchant/trades,/api/merchant/trades/**
+        - id: supply-merchant
+          uri: lb://bsh-supply-service
+          predicates:
+            - Path=/api/merchant/supplies/**
+        - id: order-consumer-trade
+          uri: lb://bsh-order-service
+          predicates:
+            - Path=/api/consumer/deposits/**,/api/consumer/trades/**,/api/consumer/sold-trades,/api/consumer/sold-trades/**
+        - id: user-consumer-wallet
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/consumer/wallet,/api/consumer/wallet/**
+        - id: user-consumer-notifications
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/consumer/notifications,/api/consumer/notifications/**
+        - id: supply-consumer
+          uri: lb://bsh-supply-service
+          predicates:
+            - Path=/api/consumer/**
+        - id: home
+          uri: lb://bsh-home-service
+          predicates:
+            - Path=/api/home/**
+        - id: admin-banners
+          uri: lb://bsh-home-service
+          predicates:
+            - Path=/api/admin/banners,/api/admin/banners/**
+        - id: admin
+          uri: lb://bsh-user-service
+          predicates:
+            - Path=/api/admin/**
+        - id: price-api
+          uri: lb://bsh-price-service
+          predicates:
+            - Path=/api/price/**
+        - id: price-ws
+          uri: lb:ws://bsh-price-service
+          predicates:
+            - Path=/ws/price/**
+  config:
+    import: optional:nacos:bsh-common.yaml
+
+bsh:
+  security:
+    jwt-secret: ${BSH_JWT_SECRET:${BSH_JWT_SECRET}}
+    expire-seconds: 86400
+    enforce: true
+    # @Value List 对 YAML 数组绑定不稳定，使用逗号分隔；上传须登录，读图 /uploads 仍公开
+    whitelist: /api/auth/captcha,/api/auth/login,/api/auth/register,/api/areas/**,/api/categories,/api/categories/**,/api/home/**,/api/price/**,/uploads/**,/ws/**,/actuator/**,/doc.html,/v3/api-docs/**,/swagger-ui/**,/webjars/**
+    protected-prefixes: /api/admin/,/api/merchant/,/api/consumer/trades,/api/consumer/deposits,/api/consumer/sold-trades,/api/consumer/wallet,/api/consumer/notifications,/api/consumer/favorites,/api/files
+  gateway:
+    ip-access:
+      enabled: true
+      trust-forwarded-headers: true
+      ignore-loopback: true
+      auto-ban-public-only: true
+      window-seconds: 60
+      rate-max: 200
+      ban-max: 800
+      auth-rate-max: 30
+      auth-ban-max: 80
+      ban-seconds: 86400
+      snapshot-refresh-seconds: 15
+      user-service-base-url: ${BSH_USER_URL:http://127.0.0.1:8081}
+      skip-paths:
+        - /actuator/**
+        - /ws/**
+        - /uploads/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.baishuhui.gateway: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    redis:
+      host: ${REDIS_HOST:${MIDDLEWARE_HOST}}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:${BSH_DB_PASS}}
+      timeout: 3s

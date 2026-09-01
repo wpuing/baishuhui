@@ -1,0 +1,11 @@
+[
+  {
+    "resource": "/api/consumer/deposits",
+    "limitApp": "default",
+    "grade": 1,
+    "count": 50,
+    "strategy": 0,
+    "controlBehavior": 0,
+    "clusterMode": false
+  }
+]

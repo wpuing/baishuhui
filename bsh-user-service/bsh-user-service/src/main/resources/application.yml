@@ -1,0 +1,118 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: bsh-user-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR}
+        fail-fast: false
+      config:
+        server-addr: ${NACOS_ADDR}
+        file-extension: yaml
+        import-check:
+          enabled: false
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1:8858}
+        eager: false
+  config:
+    import: optional:nacos:bsh-common.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+knife4j:
+  enable: true
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: assign_uuid
+  configuration:
+    map-underscore-to-camel-case: true
+
+bsh:
+  security:
+    jwt-secret: ${BSH_JWT_SECRET:${BSH_JWT_SECRET}}
+    expire-seconds: 86400
+  internal:
+    # 生产请用环境变量 BSH_INTERNAL_TOKEN 覆盖
+    token: ${BSH_INTERNAL_TOKEN:bsh-local-internal-token}
+  baidu:
+    map:
+      ak: ${BAIDU_MAP_AK:}
+      ip-url: https://api.map.baidu.com/location/ip
+  wallet:
+    # 生产默认关闭；本地调试可设 BSH_WALLET_TEST_GRANT_ENABLED=true
+    test-grant-enabled: ${BSH_WALLET_TEST_GRANT_ENABLED:false}
+    test-grant-amount: 500000
+    test-grant-channel: SYSTEM
+  services:
+    supply: ${BSH_SUPPLY_URL:http://127.0.0.1:8082}
+    order: ${BSH_ORDER_URL:http://127.0.0.1:8083}
+    home: ${BSH_HOME_URL:http://127.0.0.1:8085}
+
+logging:
+  level:
+    com.baishuhui: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:baishuhui_user;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  data:
+    redis:
+      # 本地可读 Redis 数据；默认同腾讯中间件，可用 REDIS_HOST 覆盖
+      host: ${REDIS_HOST:${MIDDLEWARE_HOST}}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:${BSH_DB_PASS}}
+      timeout: 3s
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/baishuhui?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    username: root
+    password: ${MYSQL_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: ${BSH_DB_PASS}
+      timeout: 3s
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
