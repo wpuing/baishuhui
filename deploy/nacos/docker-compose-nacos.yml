@@ -1,0 +1,21 @@
+# 本地 Nacos 参考 Compose。
+# 公开仓仅保留结构说明；下列配置项均已注释，请按本机自行填写后再启用。
+#
+# services:
+#   nacos:
+#     image: nacos/nacos-server:<VERSION>          # 例：v2.3.2
+#     container_name: <CONTAINER_NAME>            # 例：bsh-nacos
+#     environment:
+#       MODE: <MODE>                              # 例：standalone
+#       SPRING_DATASOURCE_PLATFORM: ""
+#       JVM_XMS: <HEAP>                           # 例：256m
+#       JVM_XMX: <HEAP>
+#       NACOS_AUTH_ENABLE: "<true|false>"
+#     ports:
+#       - "<HOST_PORT>:<CONTAINER_PORT>"          # 例：8848:8848
+#       - "<HOST_PORT>:<CONTAINER_PORT>"          # 例：9848:9848
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://127.0.0.1:<PORT>/nacos/"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 30

@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+
+bsh:
+  services:
+    supply: http://127.0.0.1:8082
+    order: http://127.0.0.1:8083

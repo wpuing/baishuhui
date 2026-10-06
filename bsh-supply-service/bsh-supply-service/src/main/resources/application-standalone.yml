@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/baishuhui
